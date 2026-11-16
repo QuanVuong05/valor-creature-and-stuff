@@ -1,9 +1,14 @@
 package com.example.examplemod;
 
 import com.mojang.logging.LogUtils;
-import com.example.examplemod.client.renderer.ValorCreatureRenderer;
-import com.example.examplemod.entity.ValorCreatureEntity;
+import com.example.examplemod.client.particle.LightningBoltParticle;
+import com.example.examplemod.client.particle.ThunderOrbExplosionParticle;
+import com.example.examplemod.client.renderer.BoltBaronRenderer;
+import com.example.examplemod.client.renderer.ThunderOrbRenderer;
+import com.example.examplemod.entity.BoltBaronEntity;
+import com.example.examplemod.item.CustomSpawnEggItem;
 import com.example.examplemod.init.ModEntities;
+import com.example.examplemod.init.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
@@ -17,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -59,9 +65,8 @@ public class ExampleMod
     public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
             .alwaysEat().nutrition(1).saturationMod(2f).build())));
 
-    // Creates a spawn egg for Valor Creature
-    public static final RegistryObject<Item> VALOR_CREATURE_SPAWN_EGG = ITEMS.register("valor_creature_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.VALOR_CREATURE, 0x222222, 0xAA0000, new Item.Properties()));
+    public static final RegistryObject<Item> BOLT_BARON_SPAWN_EGG = ITEMS.register("bolt_baron_spawn_egg",
+            () -> new CustomSpawnEggItem(ModEntities.BOLT_BARON, new Item.Properties()));
 
     // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
     public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
@@ -69,7 +74,7 @@ public class ExampleMod
             .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
-                output.accept(VALOR_CREATURE_SPAWN_EGG.get());
+                output.accept(BOLT_BARON_SPAWN_EGG.get());
             }).build());
 
     public ExampleMod()
@@ -85,6 +90,8 @@ public class ExampleMod
         ITEMS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so entities get registered
         ModEntities.ENTITIES.register(modEventBus);
+        // Register the Deferred Register to the mod event bus so particles get registered
+        ModParticles.PARTICLE_TYPES.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 
@@ -132,7 +139,7 @@ public class ExampleMod
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event)
         {
-            event.put(ModEntities.VALOR_CREATURE.get(), ValorCreatureEntity.createAttributes().build());
+            event.put(ModEntities.BOLT_BARON.get(), BoltBaronEntity.createAttributes().build());
         }
     }
 
@@ -151,7 +158,15 @@ public class ExampleMod
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event)
         {
-            event.registerEntityRenderer(ModEntities.VALOR_CREATURE.get(), ValorCreatureRenderer::new);
+            event.registerEntityRenderer(ModEntities.BOLT_BARON.get(), BoltBaronRenderer::new);
+            event.registerEntityRenderer(ModEntities.THUNDER_ORB.get(), ThunderOrbRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerParticleProviders(RegisterParticleProvidersEvent event)
+        {
+            event.registerSpriteSet(ModParticles.LIGHTNING_BOLT_PARTICLE.get(), LightningBoltParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.THUNDER_ORB_EXPLOSION_PARTICLE.get(), ThunderOrbExplosionParticle.Provider::new);
         }
     }
 }

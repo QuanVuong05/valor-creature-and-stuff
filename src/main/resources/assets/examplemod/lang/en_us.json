@@ -2,6 +2,6 @@
   "itemGroup.examplemod.example_tab": "Example Mod Tab",
   "block.examplemod.example_block": "Example Block",
   "item.examplemod.example_item": "Example Item",
-  "entity.examplemod.valor_creature": "Valor Creature",
-  "item.examplemod.valor_creature_spawn_egg": "Valor Creature Spawn Egg"
+  "entity.examplemod.bolt_baron": "Bolt Baron",
+  "item.examplemod.bolt_baron_spawn_egg": "Bolt Baron Spawn Egg"
 }
