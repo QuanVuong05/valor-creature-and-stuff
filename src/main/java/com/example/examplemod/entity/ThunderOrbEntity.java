@@ -3,6 +3,7 @@ package com.example.examplemod.entity;
 import com.example.examplemod.init.ModEntities;
 import com.example.examplemod.init.ModParticles;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -53,7 +54,12 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
     /** Enemies caught on the orb's path: they ride along with it until it detonates at max range. */
     private final List<LivingEntity> carried = new ArrayList<>();
     private static final double MAX_DISTANCE = 14.0D;
-    private static final double FLY_SPEED = 0.75D;
+    // The "explode" animation plays from the moment the orb is fired: it spins, the explosion lands at 0.54s,
+    // it shrinks at 0.58s and is gone at 0.67s. The orb covers its full range in exactly 11 ticks (0.55s) so the
+    // detonation (particle + sound + damage) lines up with that keyframe.
+    private static final int FLIGHT_TICKS = 11;
+    private static final double FLY_SPEED = MAX_DISTANCE / FLIGHT_TICKS;
+    private static final int REMOVE_TICK = 14; // after scale reaches 0 at 0.667s (13.3 ticks)
 
     public ThunderOrbEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -91,7 +97,8 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
         if (this.isExploding()) {
             this.setDeltaMovement(Vec3.ZERO);
             this.explodeTicks++;
-            if (this.explodeTicks >= 12) { // 12 ticks matching explosion particle and animation
+            // Removed once the animation has finished shrinking the orb (client and server alike)
+            if (this.tickCount >= REMOVE_TICK) {
                 this.discard();
             }
             return;
@@ -103,7 +110,12 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
         }
 
         if (this.level().isClientSide()) {
-            // Client only interpolates the position sent by the server
+            // A plain Entity is not interpolated by the client, so without this the orb would only jump to each
+            // position packet (stutter at this speed). Like vanilla projectiles, the client advances it by its
+            // velocity every tick (received with the spawn packet); the server's position packets just correct it.
+            Vec3 motion = this.getDeltaMovement();
+            this.setPos(this.getX() + motion.x, this.getY() + motion.y, this.getZ() + motion.z);
+            this.spawnTrailLines(motion);
             return;
         }
 
@@ -141,6 +153,32 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
         // Reached max range (14 blocks): explode
         if (traveled + step >= MAX_DISTANCE - 1.0E-3D) {
             this.detonate();
+        }
+    }
+
+    // Trail: streaks left behind by the flying orb (client side, so they sit exactly on the orb's smooth path)
+    private static final int TRAIL_CYAN_LINES = 3; // #61edff
+    private static final int TRAIL_BLUE_LINES = 2; // #1e92c0
+    private static final double TRAIL_SPREAD = 0.6D; // blocks around the orb's centre where a line can appear
+    private static final double TRAIL_BACK = 1.2D; // lines can also start up to this far behind the orb
+
+    /** Every tick of the flight: 3 cyan + 2 dark blue streaks at random spots (random size is done by the particle). */
+    private void spawnTrailLines(Vec3 motion) {
+        if (motion.lengthSqr() < 1.0E-6D) return;
+        Vec3 dir = motion.normalize();
+        double cx = this.getX();
+        double cy = this.getY() + this.getBbHeight() * 0.5D;
+        double cz = this.getZ();
+        for (int i = 0; i < TRAIL_CYAN_LINES + TRAIL_BLUE_LINES; i++) {
+            double back = this.random.nextDouble() * TRAIL_BACK;
+            double x = cx - dir.x * back + (this.random.nextDouble() * 2.0D - 1.0D) * TRAIL_SPREAD;
+            double y = cy - dir.y * back + (this.random.nextDouble() * 2.0D - 1.0D) * TRAIL_SPREAD;
+            double z = cz - dir.z * back + (this.random.nextDouble() * 2.0D - 1.0D) * TRAIL_SPREAD;
+            SimpleParticleType line = i < TRAIL_CYAN_LINES
+                    ? ModParticles.THUNDER_LINE_CYAN_PARTICLE.get()
+                    : ModParticles.THUNDER_LINE_BLUE_PARTICLE.get();
+            // The speeds carry the streak's direction = the orb's flight direction
+            this.level().addParticle(line, x, y, z, dir.x, dir.y, dir.z);
         }
     }
 
@@ -185,7 +223,6 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
         if (this.isExploding()) return;
         this.setExploding(true);
         this.setDeltaMovement(Vec3.ZERO);
-        this.triggerAnim("controller", "explode");
 
         if (this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ModParticles.THUNDER_ORB_EXPLOSION_PARTICLE.get(),
@@ -241,8 +278,9 @@ public class ThunderOrbEntity extends Entity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, state -> PlayState.STOP)
-                .triggerableAnim("explode", EXPLODE_ANIM));
+        // The whole "explode" animation (spin -> explosion -> shrink -> vanish) plays once from the moment of the shot.
+        controllers.add(new AnimationController<>(this, "controller", 0,
+                state -> state.setAndContinue(EXPLODE_ANIM)));
     }
 
     @Override

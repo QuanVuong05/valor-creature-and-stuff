@@ -1,6 +1,7 @@
 package com.example.examplemod.client.model;
 
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.client.ModRenderTypes;
 import com.example.examplemod.entity.ThunderOrbEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -24,7 +25,7 @@ public class ThunderOrbModel extends GeoModel<ThunderOrbEntity> {
 
     @Override
     public RenderType getRenderType(ThunderOrbEntity animatable, ResourceLocation texture) {
-        // Translucent render type supports the semi-transparent alpha channels of the outline layers
-        return RenderType.entityTranslucent(texture);
+        // Unlit (no shading, no darkening) translucent type with culling + depth write, see ModRenderTypes
+        return ModRenderTypes.unlitTranslucent(texture);
     }
 }

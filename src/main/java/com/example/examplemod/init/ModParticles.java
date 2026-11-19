@@ -16,4 +16,31 @@ public class ModParticles {
 
     public static final RegistryObject<SimpleParticleType> THUNDER_ORB_EXPLOSION_PARTICLE =
             PARTICLE_TYPES.register("thunder_orb_explosion", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> THUNDER_STRIKE_PARTICLE =
+            PARTICLE_TYPES.register("thunder_strike", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> EXPLOSION_RING_PARTICLE =
+            PARTICLE_TYPES.register("explosion_ring", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> LIGHTNING_SPARK_PARTICLE =
+            PARTICLE_TYPES.register("lightning_spark", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> DUST_PARTICLE =
+            PARTICLE_TYPES.register("dust", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> DUST_MEDIUM_PARTICLE =
+            PARTICLE_TYPES.register("dust_medium", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> DUST_SMALL_PARTICLE =
+            PARTICLE_TYPES.register("dust_small", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> ELECTRIC_AURA_PARTICLE =
+            PARTICLE_TYPES.register("electric_aura", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> THUNDER_LINE_CYAN_PARTICLE =
+            PARTICLE_TYPES.register("thunder_line_cyan", () -> new SimpleParticleType(true));
+
+    public static final RegistryObject<SimpleParticleType> THUNDER_LINE_BLUE_PARTICLE =
+            PARTICLE_TYPES.register("thunder_line_blue", () -> new SimpleParticleType(true));
 }

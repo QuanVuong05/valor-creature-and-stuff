@@ -18,7 +18,7 @@ public class ThunderOrbExplosionParticle extends TextureSheetParticle {
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        this.quadSize = 2.4F; // Large glowing explosion visual
+        this.quadSize = 5.0F; // Large glowing explosion visual
         this.lifetime = 12;   // 12 frames in sprite sequence
         this.hasPhysics = false;
         this.gravity = 0.0F;

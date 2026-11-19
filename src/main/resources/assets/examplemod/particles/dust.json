@@ -1,0 +1,22 @@
+{
+  "textures": [
+    "examplemod:dust_r0_f0",
+    "examplemod:dust_r0_f1",
+    "examplemod:dust_r0_f2",
+    "examplemod:dust_r0_f3",
+    "examplemod:dust_r0_f4",
+    "examplemod:dust_r0_f5",
+    "examplemod:dust_r0_f6",
+    "examplemod:dust_r0_f7",
+    "examplemod:dust_r0_f8",
+    "examplemod:dust_r1_f0",
+    "examplemod:dust_r1_f1",
+    "examplemod:dust_r1_f2",
+    "examplemod:dust_r1_f3",
+    "examplemod:dust_r1_f4",
+    "examplemod:dust_r1_f5",
+    "examplemod:dust_r1_f6",
+    "examplemod:dust_r1_f7",
+    "examplemod:dust_r1_f8"
+  ]
+}

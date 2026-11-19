@@ -2,6 +2,7 @@ package com.example.examplemod.init;
 
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.entity.BoltBaronEntity;
+import com.example.examplemod.entity.LightningProjectileEntity;
 import com.example.examplemod.entity.ThunderOrbEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -26,4 +27,13 @@ public class ModEntities {
                             .clientTrackingRange(64)
                             .updateInterval(1)
                             .build("thunder_orb"));
+
+    public static final RegistryObject<EntityType<LightningProjectileEntity>> LIGHTNING_PROJECTILE =
+            ENTITIES.register("lightning_projectile",
+                    () -> EntityType.Builder.<LightningProjectileEntity>of(LightningProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.25F, 0.25F)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .noSummon()
+                            .build("lightning_projectile"));
 }

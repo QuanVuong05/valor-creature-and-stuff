@@ -9,5 +9,7 @@ public class BoltBaronRenderer extends GeoEntityRenderer<BoltBaronEntity> {
     public BoltBaronRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BoltBaronModel());
         this.shadowRadius = 0.7F;
+        // Unlit glow texture of the normal form (bolt_baron_glow.png)
+        this.addRenderLayer(new BoltBaronGlowLayer(this));
     }
 }

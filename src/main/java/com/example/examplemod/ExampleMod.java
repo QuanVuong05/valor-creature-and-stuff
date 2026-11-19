@@ -1,9 +1,17 @@
 package com.example.examplemod;
 
 import com.mojang.logging.LogUtils;
+import com.example.examplemod.client.gui.BoltBaronBossBarOverlay;
+import com.example.examplemod.client.particle.DustParticle;
+import com.example.examplemod.client.particle.ElectricAuraParticle;
+import com.example.examplemod.client.particle.ExplosionRingParticle;
 import com.example.examplemod.client.particle.LightningBoltParticle;
+import com.example.examplemod.client.particle.LightningSparkParticle;
 import com.example.examplemod.client.particle.ThunderOrbExplosionParticle;
+import com.example.examplemod.client.particle.ThunderLineParticle;
+import com.example.examplemod.client.particle.ThunderStrikeParticle;
 import com.example.examplemod.client.renderer.BoltBaronRenderer;
+import com.example.examplemod.client.renderer.LightningProjectileRenderer;
 import com.example.examplemod.client.renderer.ThunderOrbRenderer;
 import com.example.examplemod.entity.BoltBaronEntity;
 import com.example.examplemod.item.CustomSpawnEggItem;
@@ -22,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.MinecraftForge;
@@ -160,6 +170,20 @@ public class ExampleMod
         {
             event.registerEntityRenderer(ModEntities.BOLT_BARON.get(), BoltBaronRenderer::new);
             event.registerEntityRenderer(ModEntities.THUNDER_ORB.get(), ThunderOrbRenderer::new);
+            event.registerEntityRenderer(ModEntities.LIGHTNING_PROJECTILE.get(), LightningProjectileRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerAdditionalModels(ModelEvent.RegisterAdditional event)
+        {
+            // Baked (but not tied to any block/item) so the projectile renderer can fetch it
+            event.register(LightningProjectileRenderer.MODEL);
+        }
+
+        @SubscribeEvent
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event)
+        {
+            event.registerAboveAll("bolt_baron_boss_bar", new BoltBaronBossBarOverlay());
         }
 
         @SubscribeEvent
@@ -167,6 +191,15 @@ public class ExampleMod
         {
             event.registerSpriteSet(ModParticles.LIGHTNING_BOLT_PARTICLE.get(), LightningBoltParticle.Provider::new);
             event.registerSpriteSet(ModParticles.THUNDER_ORB_EXPLOSION_PARTICLE.get(), ThunderOrbExplosionParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.THUNDER_STRIKE_PARTICLE.get(), ThunderStrikeParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.LIGHTNING_SPARK_PARTICLE.get(), LightningSparkParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.EXPLOSION_RING_PARTICLE.get(), ExplosionRingParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.DUST_PARTICLE.get(), DustParticle::large);
+            event.registerSpriteSet(ModParticles.DUST_MEDIUM_PARTICLE.get(), DustParticle::medium);
+            event.registerSpriteSet(ModParticles.DUST_SMALL_PARTICLE.get(), DustParticle::small);
+            event.registerSpriteSet(ModParticles.ELECTRIC_AURA_PARTICLE.get(), ElectricAuraParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.THUNDER_LINE_CYAN_PARTICLE.get(), ThunderLineParticle::cyan);
+            event.registerSpriteSet(ModParticles.THUNDER_LINE_BLUE_PARTICLE.get(), ThunderLineParticle::blue);
         }
     }
 }
